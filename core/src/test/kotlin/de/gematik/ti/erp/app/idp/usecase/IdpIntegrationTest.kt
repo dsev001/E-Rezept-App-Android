@@ -35,6 +35,7 @@ import de.gematik.ti.erp.app.idp.repository.IdpLocalDataSource
 import de.gematik.ti.erp.app.idp.repository.IdpPairingRepository
 import de.gematik.ti.erp.app.idp.repository.IdpRemoteDataSource
 import de.gematik.ti.erp.app.profiles.repository.DefaultProfilesRepository
+import de.gematik.ti.erp.app.vau.api.model.UntrustedOCSPList
 import de.gematik.ti.erp.app.vau.repository.VauRemoteDataSource
 import de.gematik.ti.erp.app.vau.usecase.TruststoreUseCase
 import io.mockk.MockKAnnotations
@@ -88,7 +89,7 @@ class IdpIntegrationTest {
     @MockK
     private lateinit var remoteDataSource: VauRemoteDataSource
 
-    private val accessTokenDataSource: AccessTokenDataSource = mockk()
+    private val accessTokenDataSource: AccessTokenDataSource = AccessTokenDataSource()
 
     private val lock: Mutex = mockk(relaxed = true)
 
@@ -115,7 +116,8 @@ class IdpIntegrationTest {
 
         MockKAnnotations.init(this)
 
-        coEvery { truststoreUseCase.checkIdpCertificate(any(), any()) } coAnswers {}
+        coEvery { truststoreUseCase.checkIdpCertificate(any(), any(), any()) } coAnswers {}
+        coEvery { remoteDataSource.loadOcspResponse(any(), any()) } returns Result.success(UntrustedOCSPList(emptyList()))
         every { cryptoProvider.signatureInstance() } returns Signature.getInstance("SHA256withECDSA")
         coEvery { localDataSource.loadIdpInfo() } returns null
 
@@ -162,7 +164,14 @@ class IdpIntegrationTest {
             altAuthUseCase = IdpAlternateAuthenticationUseCase(
                 basicUseCase = basicUseCase,
                 repository = idpRepository,
-                deviceInfo = mockk {}
+                deviceInfo = mockk {
+                    every { deviceName } returns "E-Rezept-Integration-Test"
+                    every { manufacturer } returns "gematik"
+                    every { productName } returns "E-Rezept-Integration-Test"
+                    every { model } returns "E-Rezept-Integration-Test"
+                    every { operatingSystem } returns "Android"
+                    every { operatingSystemVersion } returns "34"
+                }
             ),
             profilesRepository = profilesRepository,
             basicUseCase = basicUseCase,
