@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.gematik.ti.erp.app.BCProvider
+import de.gematik.ti.erp.app.BuildKonfig
 import de.gematik.ti.erp.app.DispatchProvider
 import de.gematik.ti.erp.app.ErezeptApp
 import de.gematik.ti.erp.app.appupdate.usecase.ChangeAppUpdateManagerFlagUseCase
@@ -222,9 +223,10 @@ class DebugSettingsViewModel(
             .ifEmpty {
                 ssoTokenScope?.healthCardCertificate?.let {
                     java.util.Base64.getEncoder().encodeToString(it.encoded)
-                } ?: ""
+                } ?: BuildKonfig.DEFAULT_VIRTUAL_HEALTH_CARD_CERTIFICATE
             }
         val savedPrivateKey = virtualHealthCardPrivateKeyDataStore.getPrivateKey()
+            .ifEmpty { BuildKonfig.DEFAULT_VIRTUAL_HEALTH_CARD_PRIVATE_KEY }
         updateState(
             debugSettingsData.copy(
                 cardAccessNumberIsSet = ssoTokenScope?.cardAccessNumber?.isNotEmpty() ?: false,
