@@ -183,6 +183,8 @@ secrets {
 
 // Trust local development CAs (e.g. OrbStack) in unit-test JVMs.
 // No-op unless LOCAL_TEST_TRUSTSTORE is set in ci-overrides.properties or passed as a Gradle property.
+// javax.net.ssl.trustStore REPLACES the JVM default truststore, so the referenced file must contain
+// the full JDK cacerts plus the local CA (not the local CA alone).
 val ciOverrideProperties = Properties().apply {
     val file = project.rootProject.file("ci-overrides.properties")
     if (file.exists()) {
