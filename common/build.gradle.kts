@@ -120,6 +120,11 @@ val DEBUG_TEST_IDS_ENABLED: String by overrides()
 val DEBUG_VISUAL_TEST_TAGS: String? by project
 val BUILD_TYPE_MINIFIED_DEBUG: String by overrides()
 
+// integration tests against the configured environment
+// (enable per run with -PTEST_RUN_WITH_IDP_INTEGRATION=true / -PTEST_RUN_WITH_TRUSTSTORE_INTEGRATION=true)
+val TEST_RUN_WITH_IDP_INTEGRATION: String by overrides()
+val TEST_RUN_WITH_TRUSTSTORE_INTEGRATION: String by overrides()
+
 // app center
 val APP_CENTER_SECRET: String by overrides()
 
@@ -283,8 +288,8 @@ buildkonfig {
             // ocsp
             buildConfigField(LONG, "VAU_OCSP_RESPONSE_MAX_AGE", ocspResponseMaxAge)
             // test configs
-            buildConfigField(BOOLEAN, "TEST_RUN_WITH_TRUSTSTORE_INTEGRATION", "false")
-            buildConfigField(BOOLEAN, "TEST_RUN_WITH_IDP_INTEGRATION", "false")
+            buildConfigField(BOOLEAN, "TEST_RUN_WITH_TRUSTSTORE_INTEGRATION", TEST_RUN_WITH_TRUSTSTORE_INTEGRATION.ifEmpty { "false" })
+            buildConfigField(BOOLEAN, "TEST_RUN_WITH_IDP_INTEGRATION", TEST_RUN_WITH_IDP_INTEGRATION.ifEmpty { "false" })
             // idp
             buildConfigField(STRING, "IDP_SERVICE_URI", idpServiceUri)
             buildConfigField(
