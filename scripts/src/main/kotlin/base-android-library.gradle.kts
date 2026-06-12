@@ -34,6 +34,7 @@ import generated.pdfboxBundle
 import generated.playBundle
 import generated.processphoenixBundle
 import generated.serializationBundle
+import java.util.Properties
 
 plugins {
     id("com.android.library")
@@ -180,3 +181,22 @@ secrets {
     }
 }
 
+// Trust local development CAs (e.g. OrbStack) in unit-test JVMs.
+// No-op unless LOCAL_TEST_TRUSTSTORE is set in ci-overrides.properties or passed as a Gradle property.
+val ciOverrideProperties = Properties().apply {
+    val file = project.rootProject.file("ci-overrides.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+val localTestTrustStore = ciOverrideProperties.getProperty("LOCAL_TEST_TRUSTSTORE")
+    ?: project.findProperty("LOCAL_TEST_TRUSTSTORE") as? String
+if (localTestTrustStore != null) {
+    val localTestTrustStorePassword = ciOverrideProperties.getProperty("LOCAL_TEST_TRUSTSTORE_PASSWORD")
+        ?: project.findProperty("LOCAL_TEST_TRUSTSTORE_PASSWORD") as? String
+        ?: "changeit"
+    tasks.withType<Test>().configureEach {
+        systemProperty("javax.net.ssl.trustStore", localTestTrustStore)
+        systemProperty("javax.net.ssl.trustStorePassword", localTestTrustStorePassword)
+    }
+}
