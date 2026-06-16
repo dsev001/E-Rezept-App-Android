@@ -148,5 +148,9 @@ fun OkHttpClient.Builder.addCertificateTransparencyInterceptor() =
     addNetworkInterceptor(
         certificateTransparencyInterceptor {
             failOnError = true
+            // OrbStack's local dev certificate is not CT-logged; skip CT for the local TU stack.
+            if (BuildConfigExtension.isInternalDebug) {
+                -"*.orb.local"
+            }
         }
     )
