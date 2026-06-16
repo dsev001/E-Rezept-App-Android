@@ -70,7 +70,9 @@ import java.net.UnknownHostException
  * @see okhttp3.Dns
  * @see java.net.UnknownHostException
  */
-internal class BlockingDns : Dns {
+internal class BlockingDns(
+    private val hostOverrides: Map<String, String> = emptyMap()
+) : Dns {
     private val blockedDomainSuffixes = listOf(
         ".firebaselogging.googleapis.com",
         ".firebaseremoteconfig.googleapis.com"
@@ -80,6 +82,23 @@ internal class BlockingDns : Dns {
         if (blockedDomainSuffixes.any { hostname.endsWith(it) }) {
             throw UnknownHostException("Blocked by custom DNS: $hostname")
         }
+        hostOverrides[hostname]?.let { ip ->
+            return listOf(InetAddress.getByName(ip))
+        }
         return Dns.SYSTEM.lookup(hostname)
     }
 }
+
+/**
+ * Parses a `host1=ip1;host2=ip2` specification (from BuildKonfig.ORB_LOCAL_DNS_OVERRIDES)
+ * into a host→ip map. Blank/malformed entries are ignored.
+ */
+internal fun parseHostOverrides(spec: String): Map<String, String> =
+    spec.split(";")
+        .mapNotNull { entry ->
+            val parts = entry.split("=", limit = 2)
+            val host = parts.getOrNull(0)?.trim().orEmpty()
+            val ip = parts.getOrNull(1)?.trim().orEmpty()
+            if (parts.size == 2 && host.isNotEmpty() && ip.isNotEmpty()) host to ip else null
+        }
+        .toMap()

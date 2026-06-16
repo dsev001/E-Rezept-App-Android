@@ -27,6 +27,7 @@ import com.appmattus.certificatetransparency.certificateTransparencyInterceptor
 import de.gematik.ti.erp.app.Requirement
 import de.gematik.ti.erp.app.interceptor.UserAgentHeaderInterceptor
 import de.gematik.ti.erp.app.logger.HttpAppLogger
+import de.gematik.ti.erp.app.BuildKonfig
 import de.gematik.ti.erp.app.utils.extensions.BuildConfigExtension
 import okhttp3.CipherSuite
 import okhttp3.ConnectionSpec
@@ -45,7 +46,13 @@ private const val HTTP_READ_TIMEOUT = 10000L
 private const val HTTP_WRITE_TIMEOUT = 10000L
 internal const val REQUIRED_HTTP_CLIENT = "OkHttpClientWithInterceptors"
 
-private val blockingDns = BlockingDns()
+private val blockingDns = BlockingDns(
+    if (BuildConfigExtension.isInternalDebug) {
+        parseHostOverrides(BuildKonfig.ORB_LOCAL_DNS_OVERRIDES)
+    } else {
+        emptyMap()
+    }
+)
 
 @Requirement(
     "A_20283-01#4",
