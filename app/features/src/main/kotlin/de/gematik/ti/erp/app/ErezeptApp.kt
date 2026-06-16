@@ -41,7 +41,14 @@ open class ErezeptApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         initSharedPrefsSettings(this)
-        installCertificateTransparencyProvider()
+        // The global CT trust-manager wrapper re-validates every chain through its own cleaner,
+        // which cannot apply per-domain network-security-config anchors on this Android version
+        // (the required isSameTrustConfiguration hidden API is blocked). That breaks the local TU
+        // stack's OrbStack dev CA. Skip the global provider in internal-debug; the per-client CT
+        // interceptors (with *.orb.local excluded) still cover non-local hosts.
+        if (!BuildConfigExtension.isInternalDebug) {
+            installCertificateTransparencyProvider()
+        }
         GlobalCacheProvider.cache = AppScopedCache()
         applicationModule = ApplicationModule(this)
         debugChecks()

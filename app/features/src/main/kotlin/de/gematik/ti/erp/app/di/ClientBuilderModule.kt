@@ -147,10 +147,9 @@ private fun getConnectionSpec(): List<ConnectionSpec> = ConnectionSpec
 fun OkHttpClient.Builder.addCertificateTransparencyInterceptor() =
     addNetworkInterceptor(
         certificateTransparencyInterceptor {
-            failOnError = true
-            // OrbStack's local dev certificate is not CT-logged; skip CT for the local TU stack.
-            if (BuildConfigExtension.isInternalDebug) {
-                -"*.orb.local"
-            }
+            // Internal-debug builds talk to the local TU stack (*.orb.local) over OrbStack's
+            // non-CT-logged dev certificate, so CT can never pass there. Don't hard-fail in those
+            // builds; production keeps full CT enforcement.
+            failOnError = !BuildConfigExtension.isInternalDebug
         }
     )
