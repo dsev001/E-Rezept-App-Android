@@ -125,6 +125,10 @@ val BUILD_TYPE_MINIFIED_DEBUG: String by overrides()
 val TEST_RUN_WITH_IDP_INTEGRATION: String by overrides()
 val TEST_RUN_WITH_TRUSTSTORE_INTEGRATION: String by overrides()
 
+// local DNS overrides for reaching *.orb.local from the emulator (internal-debug only)
+// format: host1=ip1;host2=ip2  — sourced from gitignored ci-overrides.properties
+val ORB_LOCAL_DNS_OVERRIDES: String by overrides()
+
 // app center
 val APP_CENTER_SECRET: String by overrides()
 
@@ -429,6 +433,8 @@ buildkonfig {
             buildConfigField(BOOLEAN, "DEBUG_TEST_IDS_ENABLED", DEBUG_TEST_IDS_ENABLED)
             // VAU feature toggles for development
             buildConfigField(BOOLEAN, "VAU_ENABLE_INTERCEPTOR", "true")
+            // local DNS overrides for reaching *.orb.local from the emulator (internal-debug only)
+            buildConfigField(STRING, "ORB_LOCAL_DNS_OVERRIDES", ORB_LOCAL_DNS_OVERRIDES)
         }
     }
 }
