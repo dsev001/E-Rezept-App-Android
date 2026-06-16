@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false"/>
+    <!-- Debug-only: trust the OrbStack Development Root CA for the local TU stack (*.orb.local). -->
+    <domain-config>
+        <domain includeSubdomains="true">orb.local</domain>
+        <trust-anchors>
+            <certificates src="system"/>
+            <certificates src="@raw/orbstack_dev_ca"/>
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
