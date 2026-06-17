@@ -24,10 +24,10 @@ package de.gematik.ti.erp.app.di
 
 import android.content.Context
 import com.appmattus.certificatetransparency.certificateTransparencyInterceptor
+import de.gematik.ti.erp.app.BuildKonfig
 import de.gematik.ti.erp.app.Requirement
 import de.gematik.ti.erp.app.interceptor.UserAgentHeaderInterceptor
 import de.gematik.ti.erp.app.logger.HttpAppLogger
-import de.gematik.ti.erp.app.BuildKonfig
 import de.gematik.ti.erp.app.utils.extensions.BuildConfigExtension
 import okhttp3.CipherSuite
 import okhttp3.ConnectionSpec
